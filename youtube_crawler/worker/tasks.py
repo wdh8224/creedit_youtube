@@ -1,6 +1,7 @@
+import json
 import re
 
-import datetime
+from datetime import datetime
 import pytz
 import requests
 from bs4 import BeautifulSoup
@@ -31,11 +32,12 @@ def crawl_youtube_channel(self, **kwargs):
         type = "channelId"
         type_id = re.search("channel\/(.+)", sample_url).group(1)
 
-    url = "https://www.googleapis.com/youtube/v3/search?key=AIzaSyA5scPTdxTt64qNgKg8T4lUHG1UxG4IFgo" \
+    url = "https://www.googleapis.com/youtube/v3/search?key=AIzaSyBfpji4AkOB6ddNAYs9PXBlPPHHFt-YZOQ" \
           "&{}={}&part=snippet,id&order=date&maxResults=20".format(type, type_id)
     response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'xml')
-    items = soup.select("items")
+    # json.loads(requests.get(
+        # "https://www.googleapis.com/youtube/v3/search?key=AIzaSyBfpji4AkOB6ddNAYs9PXBlPPHHFt-YZOQ&part=snippet&type=video&videoCategoryId=10").content)
+    items = json.loads(response.content)['items']
     results = [parse_items(item) for item in items]
     return True
 
@@ -48,11 +50,25 @@ def parse_items(item):
     video_id = item['id']['videoId']
     article_url = get_article_url(video_id)
     description = item['snippet']['description']
-
-    return article_url, title, author, published_at, description
+    infos = get_statics_info(video_id)
+    category_infos = get_all_category_info()
+    return article_url, title, author, published_at, description, infos
 
 
 def get_article_url(video_id):
     article_url = "https://www.youtube.com/embed/{}".format(video_id)
     return article_url
 
+
+def get_statics_info(video_id):
+    url = "https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id={}&key=AIzaSyBfpji4AkOB6ddNAYs9PXBlPPHHFt-YZOQ".format(video_id)
+    response = requests.get(url)
+    infos = json.loads(response.content)['items'][0]['statistics']
+    return infos
+
+
+def get_all_category_info():
+    url = "https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&regionCode=KR&key=AIzaSyBfpji4AkOB6ddNAYs9PXBlPPHHFt-YZOQ"
+    response = requests.get(url)
+    infos = json.loads(response.content)['items']
+    return infos
