@@ -6,7 +6,7 @@ celery==4.2.1
 Django==2.0.6
 pytz==2018.4
 boto3==1.9.86
-requests==2.18.4
+requests==2.20.0
 vcrpy==1.12.0
 pytest==3.6.2
 pytest-django==3.4.4
