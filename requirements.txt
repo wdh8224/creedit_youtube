@@ -3,7 +3,7 @@ lxml==4.1.1
 html5lib==1.0.1
 mysqlclient== 1.3.12
 celery==4.2.1
-Django==2.0.6
+Django==2.2.24
 pytz==2018.4
 boto3==1.9.86
 requests==2.18.4
